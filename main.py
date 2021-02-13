@@ -2,12 +2,9 @@
 
 from getopt import getopt
 from sys import argv
+from queue import Queue
 import socket
 import threading
-
-localIP     = "127.0.0.1"
-localPort   = 34000
-
 
 # usage: python3 main.py --user=User_2 --ip=127.0.0.1 --port=34000
 opts, argv = getopt(argv[1:], 'u:i:p:', ["username=", "ip=", "port="])
@@ -22,9 +19,10 @@ for k, v in opts:
         localPort = int(v)
         print(localPort)
 
+
+addr = Queue()
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind((localIP, localPort))
-
 print('MUDP server up and listening')
 
 bufferSize  = 1024
@@ -40,6 +38,8 @@ def recieve():
         print(packet)
         print(message)
 
+        addr.put(address)
+
         if message.count('|') != 0:
             spliter = message.split('|', 1)
             username = spliter[0]
@@ -49,8 +49,21 @@ def recieve():
 
 def send():
     while(True):
-        msg = f'{clientUsername}|{input()}\n'
-        UDPServerSocket.sendto(msg.encode('utf-8'), (localIP, localPort))
+        starter = False
+        addrs = addr.get()
+        addr.task_done()
+        print(f'Queue Size: {addrs.qsize()}')
+        if addrs.qsize() >= 0 or starter == True:
+            a = input("What's the target you want to send the message?: ")
+            p = input("In which port?: ")
+            sendingAddress = (a, p)
+            starter = True
+            
+            msg = f'{clientUsername}|{input()}\n'
+            UDPServerSocket.sendto(msg.encode('utf-8'), (sendingAddress[0], sendingAddress[1]))
+        else:
+            msg = f'{clientUsername}|{input()}\n'
+            UDPServerSocket.sendto(msg.encode('utf-8'), (addr[0], addr[1]))
 
 inbound = threading.Thread(target=recieve)
 inbound.start()
