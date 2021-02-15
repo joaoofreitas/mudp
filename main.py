@@ -2,12 +2,9 @@
 
 from getopt import getopt
 from sys import argv
+from queue import Empty, Queue
 import socket
 import threading
-
-localIP     = "127.0.0.1"
-localPort   = 34000
-
 
 # usage: python3 main.py --user=User_2 --ip=127.0.0.1 --port=34000
 opts, argv = getopt(argv[1:], 'u:i:p:', ["username=", "ip=", "port="])
@@ -22,21 +19,26 @@ for k, v in opts:
         localPort = int(v)
         print(localPort)
 
-UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-UDPServerSocket.bind((localIP, localPort))
 
-print('MUDP server up and listening')
+addr = [] # If this is empty it means this client want's to start a message
+UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+UDPServerSocket.bind((localIP, localPort)) # Better to get the IP automatically
 
 bufferSize  = 1024
 def recieve():
-# Listen for incoming datagrams
+    global addr
+    # Listen for incoming datagrams
     while(True):
         bytesAddressPair = UDPServerSocket.recvfrom(bufferSize)
-        message = bytesAddressPair[0]
+
+        message = bytesAddressPair[0] 
         address = bytesAddressPair[1]
-        print(bytesAddressPair[1])
+
+        addr = address
+
         packet = [hex(b) for b in message] # For debug purposes
         message = message.decode('utf-8')
+        
         print(packet)
         print(message)
 
@@ -48,13 +50,24 @@ def recieve():
             print(f'[{username}] => {message}')
 
 def send():
+    global addr
+    # Listen for incoming datagrams
     while(True):
-        msg = f'{clientUsername}|{input()}\n'
-        UDPServerSocket.sendto(msg.encode('utf-8'), (localIP, localPort))
+        message = input("Your message: ") # Waits for user input
+        if addr == []: 
+            a = input("What's the target you want to send the message?: ")
+            p = input("In which port?: ")
+            addr[0] = a
+            addr[1] = p
+        else:
+            msg = f'{clientUsername}|{message}\n'
+            UDPServerSocket.sendto(msg.encode('utf-8'), (addr[0], addr[1]))
 
 inbound = threading.Thread(target=recieve)
-inbound.start()
-
 outbound = threading.Thread(target=send)
+inbound.start()
 outbound.start()
+
+inbound.join()
+outbound.join()
     
