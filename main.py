@@ -73,8 +73,8 @@ def send():
             UDPServerSocket.sendto(msg.encode('utf-8'), (addr[0], addr[1]))
 
 
-inbound = threading.Thread(target=receive)
-outbound = threading.Thread(target=send)
+inbound = threading.Thread(name='Inbound', target=receive)
+outbound = threading.Thread(name="Outbound", target=send)
 inbound.start()
 outbound.start()
 inbound.join()
