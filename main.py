@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 username = 'Anonymous'
 PORT = 8080
 bufferSize = 1024
-debugMode = True
+debugMode = False
 
 # usage: python3 main.py --username=Username --port=8080 --debug
 opts, argv = gnu_getopt(argv[1:], 'u:p:d:', ["username=", "port=", 'debug'])  # Fix me
@@ -51,24 +51,24 @@ def receive():
             logging.debug(f'Raw Packet: {str(packet)}')
             logging.debug(f'Decoded Message: {message}')
 
-        if message.count('|') != 0:
+        if message.count('|') != 0 and message:
             splitter = message.split('|', 1)
             client_username = splitter[0]
             message = splitter[1]
 
-            print(f'[{client_username}] => {message}')
+            print(f'[{client_username}] => {message}', end='')
 
 
 def send():
     global addr
     while True:
-        message = input('> ')  # Waits for user input
+        message = str(input('>>> '))  # Waits for user input
         if not addr:
             client_address = input("What's the target you want to send the message?: ")
             client_port = input("In which port?: ")
             addr.append(client_address)
             addr.append(int(client_port))
-        elif message != '' or message != ' ':  # Need to put this null or empty right
+        elif message:
             msg = f'{username}|{message}\n'
             UDPServerSocket.sendto(msg.encode('utf-8'), (addr[0], addr[1]))
 
