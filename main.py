@@ -1,33 +1,40 @@
 #!/usr/bin/python3
 
-from getopt import getopt
+from getopt import gnu_getopt
 from sys import argv
 import socket
 import threading
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 username = 'Anonymous'
 PORT = 8080
+bufferSize = 1024
+debugMode = True
 
-# usage: python3 main.py --user=User --port=8080
-opts, argv = getopt(argv[1:], 'u:i:p:', ["username=", "port="])
+# usage: python3 main.py --username=Username --port=8080 --debug
+opts, argv = gnu_getopt(argv[1:], 'u:p:d:', ["username=", "port=", 'debug'])  # Fix me
 for k, v in opts:
     if k == '-u' or k == '--username':
         username = str(v)
-        print(username)
     elif k == '-p' or k == '--port':
         PORT = int(v)
-        print(PORT)
+    elif k == '-d' or k == '--debug':
+        debugMode = True
+
+if debugMode:
+    logging.debug(f'Username: {username}')
+    logging.debug(f'Port: {PORT}')
+    logging.debug(f'Debug: {debugMode}')
 
 addr = []  # If this is empty it means this client want's to start a message
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind(('0.0.0.0', PORT))  # Better to get the IP automatically
 
-bufferSize = 1024
-
 
 def receive():
     global addr
-    # Listen for incoming datagrams
     while True:
         bytes_address_pair = UDPServerSocket.recvfrom(bufferSize)
 
@@ -36,12 +43,13 @@ def receive():
         addr.append(address[0])
         addr.append(address[1])
 
-        print(addr)
         packet = [hex(b) for b in message]  # For debug purposes
         message = message.decode('utf-8')
 
-        print(packet)
-        print(message)
+        if debugMode:
+            logging.debug(f'Address: {addr}')
+            logging.debug(f'Raw Packet: {str(packet)}')
+            logging.debug(f'Decoded Message: {message}')
 
         if message.count('|') != 0:
             splitter = message.split('|', 1)
@@ -53,7 +61,6 @@ def receive():
 
 def send():
     global addr
-    # Listen for incoming datagrams
     while True:
         message = input('> ')  # Waits for user input
         if not addr:
@@ -70,6 +77,5 @@ inbound = threading.Thread(target=receive)
 outbound = threading.Thread(target=send)
 inbound.start()
 outbound.start()
-
 inbound.join()
 outbound.join()
