@@ -2,12 +2,15 @@
 
 from getopt import gnu_getopt
 from sys import argv
+from zlib import compress, decompress
 import socket
 import threading
 import logging
+import rsa
 
 logging.basicConfig(level=logging.DEBUG)
 
+(PUBLIC_KEY, PRIVATE_KEY) = rsa.newkeys(512, poolsize=1)  # To implement
 username = 'Anonymous'
 PORT = 8080
 bufferSize = 1024
@@ -24,6 +27,7 @@ for k, v in opts:
         debugMode = True
 
 if debugMode:
+    logging.debug(f'Public key: {PUBLIC_KEY}')
     logging.debug(f'Username: {username}')
     logging.debug(f'Port: {PORT}')
     logging.debug(f'Debug: {debugMode}')
@@ -43,7 +47,8 @@ def receive():
         addr.append(address[0])
         addr.append(address[1])
 
-        packet = [hex(b) for b in message]  # For debug purposes
+        packet = [hex(b) for b in message]
+        message = decompress(message)
         message = message.decode('utf-8')
 
         if debugMode:
@@ -70,7 +75,11 @@ def send():
             addr.append(int(client_port))
         elif message:
             msg = f'{username}|{message}\n'
-            UDPServerSocket.sendto(msg.encode('utf-8'), (addr[0], addr[1]))
+            msg = msg.encode('utf-8')
+            msg = compress(msg)
+            if debugMode:
+                logging.debug(f'Sending compressed message: {msg}')
+            UDPServerSocket.sendto(msg, (addr[0], addr[1]))
 
 
 inbound = threading.Thread(name='Inbound', target=receive)
