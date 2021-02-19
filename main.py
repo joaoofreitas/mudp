@@ -8,12 +8,11 @@ import threading
 import logging
 import rsa
 
-logging.basicConfig(level=logging.DEBUG)
-
 (PUBLIC_KEY, PRIVATE_KEY) = rsa.newkeys(512, poolsize=1)  # To implement
 username = 'Anonymous'
 PORT = 8080
 bufferSize = 1024
+peerPublicKey = ''
 debugMode = False
 
 # usage: python3 main.py --username=Username --port=8080 --debug
@@ -24,13 +23,12 @@ for k, v in opts:
     elif k == '-p' or k == '--port':
         PORT = int(v)
     elif k == '-d' or k == '--debug':
-        debugMode = True
+        logging.basicConfig(level=logging.DEBUG)
 
-if debugMode:
-    logging.debug(f'Public key: {PUBLIC_KEY}')
-    logging.debug(f'Username: {username}')
-    logging.debug(f'Port: {PORT}')
-    logging.debug(f'Debug: {debugMode}')
+logging.debug(f'Public key: {PUBLIC_KEY}')
+logging.debug(f'Username: {username}')
+logging.debug(f'Port: {PORT}')
+logging.debug(f'Debug: {debugMode}')
 
 addr = []  # If this is empty it means this client want's to start a message
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -39,6 +37,7 @@ UDPServerSocket.bind(('0.0.0.0', PORT))  # Better to get the IP automatically
 
 def receive():
     global addr
+    global peerPublicKey
     while True:
         bytes_address_pair = UDPServerSocket.recvfrom(bufferSize)
 
@@ -49,23 +48,25 @@ def receive():
 
         packet = [hex(b) for b in message]
         message = decompress(message)
+        message = rsa.decrypt()
         message = message.decode('utf-8')
 
-        if debugMode:
-            logging.debug(f'Address: {addr}')
-            logging.debug(f'Raw Packet: {str(packet)}')
-            logging.debug(f'Decoded Message: {message}')
+        logging.debug(f'Address: {addr}')
+        logging.debug(f'Raw Packet: {str(packet)}')
+        logging.debug(f'Decoded Message: {message}')
 
         if message.count('|') != 0 and message:
-            splitter = message.split('|', 1)
+            splitter = message.split('|', 2)
             client_username = splitter[0]
             message = splitter[1]
+            peerPublicKey = splitter[2]
 
             print(f'[{client_username}] => {message}', end='')
 
 
 def send():
     global addr
+    global peerPublicKey
     while True:
         message = str(input('>>> '))  # Waits for user input
         if not addr:
@@ -76,9 +77,10 @@ def send():
         elif message:
             msg = f'{username}|{message}\n'
             msg = msg.encode('utf-8')
+            msg = rsa.encrypt(msg, peerPublicKey)
             msg = compress(msg)
-            if debugMode:
-                logging.debug(f'Sending compressed message: {msg}')
+
+            logging.debug(f'Sending compressed message: {msg}')
             UDPServerSocket.sendto(msg, (addr[0], addr[1]))
 
 
