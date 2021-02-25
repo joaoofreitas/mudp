@@ -7,7 +7,7 @@ import socket
 import threading
 import logging
 import rsa
-
+import re
 
 # Default variables
 username = 'Anonymous'
@@ -15,7 +15,7 @@ PORT = 8080
 bufferSize = 1024
 
 # Generation and initialization of RSA Keys
-(PUBLIC_KEY, PRIVATE_KEY) = rsa.newkeys(bufferSize, poolsize=2)
+(PUBLIC_KEY, PRIVATE_KEY) = rsa.newkeys(bufferSize, poolsize=1)
 peerPublicKey = rsa.PublicKey(0, 0)
 
 # Initialization of socket and temporary address variable.
@@ -23,6 +23,9 @@ addr = []  # If this is empty it means this client want's to start a message
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind(('0.0.0.0', PORT))  # Better to get the IP automatically
 
+# Regex for input validation
+ipRegex = '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
+portRegex = '^((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}))$'
 
 # Sets and creates the arguments and flags for initializing the program
 # Example usage: python3 main.py --username=Username --port=8080 --debug
@@ -85,11 +88,18 @@ def receive():
 def send():
     global addr
     global peerPublicKey
+    global ipRegex, portRegex
     while True:  # Loops to be always expecting user input
         message = str(input('>>> '))  # User input sanitizing and prompting
         if not addr or peerPublicKey.e == 0:  # Checks if a connection and handshake has been established
-            client_address = input("What's the target you want to send the message?: ")
-            client_port = input("In which port?: ")
+            client_address = ''
+            client_port = ''
+            while not re.search(ipRegex, client_address):
+                client_address = input("What's the target you want to send the message?: ")
+
+            while not re.search(portRegex, client_port):
+                client_port = input("In which port?: ")
+
             addr.append(client_address)
             addr.append(int(client_port))
 
