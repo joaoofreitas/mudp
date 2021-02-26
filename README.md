@@ -24,7 +24,7 @@
 </p>
 
 
-## Table of Contents
+## Table of Contents 
 
 * [About the Project](#about-the-project)
   * [Built With](#built-with)
@@ -39,7 +39,7 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Project
+## About The Project 📬
 
 __MUDP__ stands for _Messaging User Datagram Protocol_ and it is a UDP based protocol created by [_@joaoofreitas_](https://github.com/joaoofreitas) that sends and receives asynchronous encrypted messages from a peer to another.
 
@@ -51,23 +51,23 @@ Use cases:
 
 - Full control of communication with another person without sniffing or network tracking.
 
-### Built With
+### Built With 🐍
 
 - [python](https://www.python.org)
 - [rsa](https://pypi.org/project/rsa/)
 
-## Getting Started
+## Getting Started 🏁
 
 Follow the steps bellow for installing test te project in your machine.
 
-### Prerequisites
+### Prerequisites 🛠
 
 To install this software you need to have installed:
   - [Git](https://git-scm.com/downloads)
   - [Python3](https://www.python.org)
   - [Python package manager - _pip3_](https://pip.pypa.io/en/stable/installing/)
 
-### Installation
+### Installation 
 
 1. Clone the repository
 ```sh
