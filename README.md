@@ -1,8 +1,8 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/joaoofreitas/mudp/>
-    <img src="icon.png" alt="Logo" width="320" height="226">
+  <a href="https://github.com/joaoofreitas/mudp"/>
+    <img src="https://github.com/joaoofreitas/mudp/blob/main/.docs_media/icon.png" alt="Logo" width="160" height="113">
   </a>
 
   <h3 align="center">MUDP - Message User Datagram Protocol</h3>
