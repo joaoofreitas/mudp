@@ -15,7 +15,7 @@ PORT = 8080
 bufferSize = 1024
 
 # Generation and initialization of RSA Keys
-(PUBLIC_KEY, PRIVATE_KEY) = rsa.newkeys(bufferSize, poolsize=2)
+(PUBLIC_KEY, PRIVATE_KEY) = rsa.newkeys(bufferSize, poolsize=1)
 peerPublicKey = rsa.PublicKey(0, 0)
 
 # Initialization of socket and temporary address variable.
