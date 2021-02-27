@@ -2,7 +2,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/joaoofreitas/mudp"/>
-    <img src="https://github.com/joaoofreitas/mudp/blob/main/.docs_media/icon.png" alt="Logo" width="160" height="113">
+    <img src="https://user-images.githubusercontent.com/31630346/109370669-36d21880-7899-11eb-97cb-2f759caf0ec6.png" alt="Logo" width="160" height="113">
   </a>
 
   <h3 align="center">MUDP - Message User Datagram Protocol</h3>
