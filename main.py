@@ -18,11 +18,6 @@ bufferSize = 1024
 (PUBLIC_KEY, PRIVATE_KEY) = rsa.newkeys(bufferSize, poolsize=1)
 peerPublicKey = rsa.PublicKey(0, 0)
 
-# Initialization of socket and temporary address variable.
-addr = []  # If this is empty it means this client want's to start a message
-UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-UDPServerSocket.bind(('0.0.0.0', PORT))  # Better to get the IP automatically
-
 # Regex for input validation
 ipRegex = '^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$'
 portRegex = '^((6553[0-5])|(655[0-2][0-9])|(65[0-4][0-9]{2})|(6[0-4][0-9]{3})|([1-5][0-9]{4})|([0-5]{0,5})|([0-9]{1,4}))$'
@@ -37,6 +32,12 @@ for k, v in opts:
         PORT = int(v)
     elif k == '-d' or k == '--debug':
         logging.basicConfig(level=logging.DEBUG)
+
+
+# Initialization of socket and temporary address variable.
+addr = []  # If this is empty it means this client want's to start a message
+UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+UDPServerSocket.bind(('0.0.0.0', PORT))  # Better to get the IP automatically
 
 # Debug Mode Logs
 logging.debug(f'Public key: {PUBLIC_KEY}')
