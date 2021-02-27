@@ -41,6 +41,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project 📬
 
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/31630346/109371170-9c270900-789b-11eb-8a9e-58391746aceb.gif" alt="App">
+</p>
+
+
 __MUDP__ stands for _Messaging User Datagram Protocol_ and it is a UDP based protocol created by [_@joaoofreitas_](https://github.com/joaoofreitas) that sends and receives asynchronous encrypted messages from a peer to another.
 
 This project is a code implementation of this protocol _(I consider the protocol itself just theory)_.
