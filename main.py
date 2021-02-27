@@ -97,7 +97,7 @@ def send():
             while not re.search(ipRegex, client_address):
                 client_address = input("What's the target you want to send the message?: ")
 
-            while not re.search(portRegex, client_port):
+            while not re.search(portRegex, client_port) or client_port in (None, ''):
                 client_port = input("In which port?: ")
 
             addr.append(client_address)
@@ -105,7 +105,11 @@ def send():
 
             # Exchange Public Keys using handshake
             logging.debug(f'Sending handshake to {addr[0]}: PUBLIC KEY: {PUBLIC_KEY}')
-            UDPServerSocket.sendto(f'RSA|{PUBLIC_KEY.n}|{PUBLIC_KEY.e}'.encode('utf-8'), (addr[0], addr[1]))
+            try:
+                UDPServerSocket.sendto(f'RSA|{PUBLIC_KEY.n}|{PUBLIC_KEY.e}'.encode('utf-8'), (addr[0], addr[1]))
+            except OSError as error:
+                print("Something went wrong, please try a different IP and/or port number!")
+                logging.debug(f'Error: {error}')
         elif message:  # Creates the message in M-UDP format. Encodes, encrypts, compresses and sends it.
             msg = f'{username}|{message}\n'
             msg = msg.encode('utf-8')
