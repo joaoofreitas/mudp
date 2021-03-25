@@ -124,8 +124,6 @@ Contributions are what make the open source community such an amazing place to b
 
 <!-- LICENSE -->
 ## 📝 License
-Describe your License for your project. 
-
 Distributed under the MIT License. See `LICENSE` for more information.
 
 <!-- CONTACT -->
